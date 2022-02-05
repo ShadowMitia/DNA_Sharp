@@ -1,0 +1,3 @@
+---
+Checks: '*,-llvm*,-google*,-fuchsia*,-altera*,-modernize-use-trailing-return-type,-misc-definitions-in-headers,-hicpp,-cppcoreguidelines-avoid-magic-numbers,-readability-magic-numbers,-hicpp-uppercase-literal-suffix,readability-uppercase-literal-suffix'
+...
