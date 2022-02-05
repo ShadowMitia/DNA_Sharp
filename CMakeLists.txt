@@ -6,37 +6,15 @@ project(dna_sharp
 set(CMAKE_CXX_STANDARD 20)
 
 
-include(${PROJECT_SOURCE_DIR}/cmake/flags.cmake) # will containe most default flags
-include(${PROJECT_SOURCE_DIR}/cmake/asan.cmake) 
-include(${PROJECT_SOURCE_DIR}/cmake/cppcheck.cmake)
+include(${PROJECT_SOURCE_DIR}/cmake/yacht.cmake) # will containe most default flags
+add_compile_commands_json()
 
-if(NOT EXISTS "${CMAKE_BINARY_DIR}/conan.cmake")
-        message(STATUS "Downloading conan.cmake from https://github.com/conan-io/cmake-conan")
-        file(DOWNLOAD "https://raw.githubusercontent.com/conan-io/cmake-conan/master/conan.cmake"
-                      "${CMAKE_BINARY_DIR}/conan.cmake")
-endif()
-include(${CMAKE_BINARY_DIR}/conan.cmake)
-conan_cmake_run(CONANFILE 
-REQUIRES
-fmt/8.0.1
-                BASIC_SETUP
-                BUILD missing
-                CONFIGURATION_TYPES "Release")
-set(CMAKE_MODULE_PATH "${CMAKE_BINARY_DIR}" ${CMAKE_MODULE_PATH})
+conan_get_package(PACKAGE fmt/8.0.1 catch2/2.13.7)
 
-# customizable flags for each build and compiler.
-#set_flag(COMPILER clang gnu intel TARGET release relwithdebinfo FLAGS -O3 -march=native)
-#set_flag(COMPILER clang gnu intel FLAGS -fexceptions -fopenmp)
-#set_flag(COMPILER msvc FLAGS /openmp)
-#set_flag(COMPILER clang FLAGS -stdlib=libc++)
-
-
-include_directories("${PROJECT_SOURCE_DIR}/src")
-#add_subdirectory("${PROJECT_SOURCE_DIR}/src")
+find_package(Catch2 REQUIRED)
 
 add_executable(dna_sharp src/main.cpp)
-
 target_link_libraries(dna_sharp PUBLIC ${CONAN_LIBS})
-#target_include_directories(main PUBLIC "${PROJECT_SOURCE_DIR}/external/utils")
-#target_include_directories(main SYSTEM PUBLIC "${PROJECT_SOURCE_DIR}/external/[NAME]"
-#                                       PUBLIC "${PROJECT_SOURCE_DIR}/external/[NAME]")
+
+catch2_add_test(NAME interpreter_tests SOURCES tests/interpreter_tests.cpp)
+target_link_libraries(interpreter_tests PRIVATE ${CONAN_LIBS} Catch2::Catch2)
